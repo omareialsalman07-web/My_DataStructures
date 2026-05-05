@@ -12,9 +12,9 @@ int main()
 	arr[4] = 5;
 
 
-	for (int i = 0; i < arr.size(); i++)
+	for (auto x : arr)
 	{
-		std::cout << arr[i] << std::endl;
+
 	}
 
 	return 0;

@@ -20,6 +20,9 @@ public:
 	T* Data() { return m_data; }
 	const T* Data() const { return m_data; }
 
+	T* begin() { return _data; }
+	T* end() { return _data + _size; }
+
 private:
 	T m_data[_size];
 };
