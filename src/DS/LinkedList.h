@@ -2,10 +2,10 @@
 #include <iostream>
 #include <stdexcept>
 
-template<typename T>
+template<class T>
 class LinkedList
 {
-    template<typename T>
+    template<class T>
     class Node
     {
     public:
@@ -42,13 +42,13 @@ public:
     ~LinkedList()
     {
         Node<T>* temp = head;
-
         while (temp != nullptr)
         {
             Node<T>* next = temp->GetNext();
             delete temp;
             temp = next;
         }
+        _size = 0;
     }
 
 public:
@@ -105,7 +105,7 @@ public:
             return;
         }
 
-        Node<T>* temp = FindNode(position - 1);
+        Node<T>* temp = GetNode(position - 1);
 
         Node<T>* newNode = new Node<T>(value);
         Node<T>* nextNode = temp->GetNext();
@@ -193,7 +193,7 @@ public:
             return;
         }
 
-        Node<T>* temp = FindNode(position - 1);
+        Node<T>* temp = GetNode(position - 1);
 
         Node<T>* nodeToDelete = temp->GetNext();
         Node<T>* nextNode = nodeToDelete->GetNext();
@@ -218,7 +218,7 @@ public:
 
     T& operator[](size_t index)
     {
-        Node<T>* node = FindNode(index);
+        Node<T>* node = GetNode(index);
 
         if (node == nullptr)
             throw std::out_of_range("Index out of range");
@@ -228,12 +228,26 @@ public:
 
     const T& operator[](size_t index) const
     {
-        Node<T>* node = FindNode(index);
+        Node<T>* node = GetNode(index);
 
         if (node == nullptr)
             throw std::out_of_range("Index out of range");
 
         return node->GetValue();
+    }
+
+    T* begin() { return head; }
+    const T* begin() const { return head; }
+
+    T* end() { return tail; }
+    const T* end() const { return tail; }
+
+    void clean()
+    {
+        while (_size > 0)
+        {
+            DeleteFirst();
+        }
     }
 
 private:
@@ -247,9 +261,9 @@ private:
         _size++;
     }
 
-    Node<T>* FindNode(size_t index) const
+    Node<T>* GetNode(size_t index) const
     {
-        if (index >= _size)
+        if (index >= _size || index < 0)
             return nullptr;
 
         Node<T>* temp = head;
