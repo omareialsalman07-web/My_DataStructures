@@ -1,24 +1,28 @@
 #include <iostream>
 #include "DS/Array.h"
-#include "DS/LinkedList.h"
-
-void PrintList(const LinkedList<int>& list)
-{
-	for (int i = 0; i < list.size(); i++)
-	{
-		std::cout << list[i] << std::endl;
-	}
-}
+#include "DS/Queue.h"
 
 int main()
 {
-	LinkedList<int> list;
+	Queue<int> q;
 
-	list.InsertAtEnd(1);
-	list.InsertAtEnd(2);
-	list.InsertAtEnd(3);
-	list.InsertAtEnd(4);
-	list.InsertAtEnd(5);
+	q.push(10);
+	q.push(20);
+	q.push(30);
+	q.push(40);
+	q.push(50);
+
+	std::cout << "Queue : \n";
+	q.Print();
+
+	std::cout << "Size : " << q.size() << std::endl;
+	std::cout << "front : " << q.front() << std::endl;
+	std::cout << "back : " << q.back() << std::endl;
+
+	q.pop();
+
+	std::cout << "After pop : \n\n";
+	q.Print();
 
 	return 0;
 }

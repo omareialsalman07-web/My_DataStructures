@@ -52,7 +52,7 @@ public:
     }
 
 public:
-    void InsertAtBeginning(const T& value)
+    void InsertFirst(const T& value)
     {
         if (IsEmpty())
         {
@@ -70,7 +70,7 @@ public:
         _size++;
     }
 
-    void InsertAtEnd(const T& value)
+    void InsertLast(const T& value)
     {
         if (IsEmpty())
         {
@@ -95,13 +95,13 @@ public:
 
         if (position == 0)
         {
-            InsertAtBeginning(value);
+            InsertFirst(value);
             return;
         }
 
         if (position == _size)
         {
-            InsertAtEnd(value);
+            InsertLast(value);
             return;
         }
 
@@ -250,6 +250,16 @@ public:
         }
     }
 
+    void Print()
+    {
+        Node<T>* temp = head;
+        while (temp != nullptr)
+        {
+            std::cout << temp->GetValue() << std::endl;
+            temp = temp->GetNext();
+        }
+    }
+
 private:
     void InsertTheFirstNode(const T& value)
     {
@@ -261,6 +271,7 @@ private:
         _size++;
     }
 
+protected:
     Node<T>* GetNode(size_t index) const
     {
         if (index >= _size || index < 0)
