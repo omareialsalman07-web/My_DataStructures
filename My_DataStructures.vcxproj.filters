@@ -27,5 +27,8 @@
     <ClInclude Include="src\DS\Array.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\DS\LinkedList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
