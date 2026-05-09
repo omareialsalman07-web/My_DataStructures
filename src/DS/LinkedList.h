@@ -218,22 +218,11 @@ public:
 
     T& operator[](size_t index)
     {
-        Node<T>* node = GetNode(index);
-
-        if (node == nullptr)
-            throw std::out_of_range("Index out of range");
-
-        return node->GetValue();
+        return GetElement(index);
     }
-
     const T& operator[](size_t index) const
     {
-        Node<T>* node = GetNode(index);
-
-        if (node == nullptr)
-            throw std::out_of_range("Index out of range");
-
-        return node->GetValue();
+        return GetElement(index);
     }
 
     T* begin() { return head; }
@@ -241,6 +230,11 @@ public:
 
     T* end() { return tail; }
     const T* end() const { return tail; }
+
+    void Reverse()
+    {
+
+    }
 
     void clean()
     {
@@ -269,6 +263,16 @@ private:
         tail = newNode;
 
         _size++;
+    }
+
+    T& GetElement(size_t index) const
+    {
+        Node<T>* node = GetNode(index);
+
+        if (node == nullptr)
+            throw std::out_of_range("Index out of range");
+
+        return node->GetValue();
     }
 
 protected:
