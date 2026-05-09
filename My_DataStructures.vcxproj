@@ -153,6 +153,7 @@
     <ClInclude Include="src\DS\Array.h" />
     <ClInclude Include="src\DS\LinkedList.h" />
     <ClInclude Include="src\DS\Queue.h" />
+    <ClInclude Include="src\DS\Stack.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

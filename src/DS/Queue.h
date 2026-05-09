@@ -1,64 +1,64 @@
 #pragma once
 #include "LinkedList.h"
 
-template<typename T>
+template<class T>
 class Queue
 {
 protected:
-	LinkedList<T> m_Queue;
+	LinkedList<T> m_List;
 public:
-	size_t size() const { return m_Queue.size(); }
+	size_t size() const { return m_List.size(); }
 	
-	void push(const T& value)
+	virtual void push(const T& value)
 	{
-		m_Queue.InsertLast(value);
+		m_List.InsertLast(value);
 	}
 
-	void pop()
+	virtual void pop()
 	{
-		m_Queue.DeleteFirst();
+		m_List.DeleteFirst();
 	}
 
 	void InsertAtFront(const T& value)
 	{
-		m_Queue.InsertFirst(value);
+		m_List.InsertFirst(value);
 	}
 
 	void InsertAtBack(const T& value)
 	{
-		m_Queue.InsertLast(value);
+		m_List.InsertLast(value);
 	}
 
 	void InsertAtPosition(const T& value, size_t position)
 	{
-		m_Queue.InsertAtPosition(value, position);
+		m_List.InsertAtPosition(value, position);
 	}
 
 
-	T front() const { return m_Queue[0]; }
-	T back() const { return m_Queue[size() - 1]; }
+	T front() const { return m_List[0]; }
+	T back() const { return m_List[size() - 1]; }
 
 	T& operator[](size_t index)
 	{
-		return m_Queue[index];
+		return m_List[index];
 	}
 	const T& operator[](size_t index) const
 	{
-		return m_Queue[index];
+		return m_List[index];
 	}
 
 	void Reverse()
 	{
-		m_Queue.Reverse();
+		m_List.Reverse();
 	}
 	
 	void clear()
 	{
-		m_Queue.clean();
+		m_List.clean();
 	}
 
 	void Print()
 	{
-		m_Queue.Print();
+		m_List.Print();
 	}
 };
