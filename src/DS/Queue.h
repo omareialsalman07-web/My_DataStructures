@@ -56,9 +56,4 @@ public:
 	{
 		m_List.clean();
 	}
-
-	void Print()
-	{
-		m_List.Print();
-	}
 };

@@ -4,6 +4,7 @@
 template<class T>
 class Stack : public Queue<T>
 {
+public:
 	void push(const T& item) override
 	{
 		Queue <T>::m_List.InsertFirst(item);

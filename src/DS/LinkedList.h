@@ -244,16 +244,6 @@ public:
         }
     }
 
-    void Print()
-    {
-        Node<T>* temp = head;
-        while (temp != nullptr)
-        {
-            std::cout << temp->GetValue() << std::endl;
-            temp = temp->GetNext();
-        }
-    }
-
 private:
     void InsertTheFirstNode(const T& value)
     {
