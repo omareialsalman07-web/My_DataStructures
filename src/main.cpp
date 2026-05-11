@@ -3,6 +3,14 @@
 #include "DS/Queue.h"
 #include "DS/DynamicArray.h"
 
+void Print(const DynamicArray<int>& arr)
+{
+	for (const int& x : arr)
+	{
+		std::cout << x << std::endl;
+	}
+}
+
 int main()
 {
 	DynamicArray<int> dArr(5);
@@ -13,12 +21,14 @@ int main()
 	dArr[3] = 4;
 	dArr[4] = 5;
 
-	dArr.DeleteItem(3);
 
-	for (const int& x : dArr)
-	{
-		std::cout << x << std::endl;
-	}
+	std::cout << "Before inserting" << std::endl;
+	Print(dArr);
+
+	std::cout << "After inserting" << std::endl;
+	dArr.InsertLast(55);
+	std::cout << "new Size = " << dArr.size() << std::endl;
+	Print(dArr);
 
 	return 0;
 }

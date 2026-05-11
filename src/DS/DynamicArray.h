@@ -53,8 +53,6 @@ public:
 		return (_size <= 0);
 	}
 
-
-
 	void Resize(unsigned int newSize)
 	{
 		if (newSize < 0)
@@ -75,6 +73,39 @@ public:
 		delete[] m_Array;
 		m_Array = _tempArray;
 		_size = newSize;
+	}
+
+	void InsertAtPosition(size_t index, const T& value)
+	{
+		if (index < 0 || index > _size)
+			throw std::out_of_range("index is out of range!");
+
+		++_size;
+		_tempArray = new T[_size];
+
+		//Copy befor index
+		for (int i = 0; i < index; i++)
+		{
+			_tempArray[i] = m_Array[i];
+		}
+		_tempArray[index] = value;
+		//Copy after index
+		for (int i = index; i < _size - 1; i++)
+		{
+			_tempArray[i + 1] = m_Array[i];
+		}
+
+		delete[] m_Array;
+		m_Array = _tempArray;
+	}
+
+	void InsertFirst(const T& value)
+	{
+		InsertAtPosition(0, value);
+	}
+	void InsertLast(const T& value)
+	{
+		InsertAtPosition(_size, value);
 	}
 
 	void DeleteLast()
@@ -154,6 +185,18 @@ public:
 		delete[] m_Array;
 		_tempArray = new T[0];
 		m_Array = _tempArray;
+	}
+
+	DynamicArray<T> clone()
+	{
+		DynamicArray<T> clonedArray(_size);
+
+		for (int i = 0; i < _size; i++)
+		{
+			clonedArray[i] = m_Array[i];
+		}
+
+		return clonedArray;
 	}
 
 private:
