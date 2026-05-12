@@ -11,6 +11,10 @@ int main()
 	list.push_back(13);
 	list.push_back(14);
 
+	for (auto x : list)
+	{
+		std::cout << x << std::endl;
+	}
 	
 	return 0;
 }

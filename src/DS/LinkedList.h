@@ -16,6 +16,73 @@ private:
         }
     };
 
+    class Iterator
+    {
+    private:
+        Node* current;
+
+    public:
+        Iterator(Node* node = nullptr)
+            : current(node) {
+        }
+
+        T& operator*()
+        {
+            return current->value;
+        }
+
+        const T& operator*() const
+        {
+            return current->value;
+        }
+
+        Iterator& operator++()
+        {
+            if (current)
+                current = current->next;
+            return *this;
+        }
+
+        bool operator!=(const Iterator& other) const
+        {
+            return current != other.current;
+        }
+
+        bool operator==(const Iterator& other) const
+        {
+            return current == other.current;
+        }
+    };
+
+    class ConstIterator
+    {
+    private:
+        const Node* current;
+
+    public:
+        ConstIterator(const Node* node = nullptr)
+            : current(node) {
+        }
+
+        const T& operator*() const
+        {
+            return current->value;
+        }
+
+        ConstIterator& operator++()
+        {
+            if (current)
+                current = current->next;
+            return *this;
+        }
+
+        bool operator!=(const ConstIterator& other) const
+        {
+            return current != other.current;
+        }
+    };
+
+
     Node* head;
     Node* tail;
     size_t m_size;
@@ -109,11 +176,13 @@ public:
     }
 
     // ---------------- Iterators ----------------
-    Node* begin() { return head; }
-    const Node* begin() const { return head; }
+    Iterator begin() { return Iterator(head); }
 
-    Node* end() { return nullptr; }             // tail->next = null
-    const Node* end() const { return nullptr; } // tail->next = null
+    Iterator end(){ return Iterator(nullptr);}
+
+    ConstIterator begin() const { return ConstIterator(head); }
+
+    ConstIterator end() const { return ConstIterator(nullptr); }// tail->next = null
 
     // ---------------- Insert ----------------
     void push_front(const T& value)
