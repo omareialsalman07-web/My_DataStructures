@@ -152,6 +152,8 @@
   <ItemGroup>
     <ClInclude Include="src\DS\Array.h" />
     <ClInclude Include="src\DS\DynamicArray.h" />
+    <ClInclude Include="src\DS\IQueue.h" />
+    <ClInclude Include="src\DS\IStack.h" />
     <ClInclude Include="src\DS\LinkedList.h" />
     <ClInclude Include="src\DS\Queue.h" />
     <ClInclude Include="src\DS\QueueArr.h" />

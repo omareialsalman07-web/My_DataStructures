@@ -1,283 +1,307 @@
 #pragma once
-#include <iostream>
 #include <stdexcept>
 
 template<class T>
 class LinkedList
 {
-    template<class T>
-    class Node
+private:
+    struct Node
     {
-    public:
-        Node(const T& value)
-            : value(value), next(nullptr), prev(nullptr) {
-        }
-
-    private:
         T value;
-        Node<T>* next;
-        Node<T>* prev;
+        Node* next;
+        Node* prev;
 
-    public:
-        T& GetValue() { return value; }
-        const T& GetValue() const { return value; }
-
-        Node<T>* GetNext() const { return next; }
-        void SetNext(Node<T>* nextNode) { next = nextNode; }
-
-        Node<T>* GetPrev() const { return prev; }
-        void SetPrev(Node<T>* prevNode) { prev = prevNode; }
+        Node(const T& v)
+            : value(v), next(nullptr), prev(nullptr) {
+        }
     };
 
-private:
-    Node<T>* head;
-    Node<T>* tail;
-    size_t _size;
+    Node* head;
+    Node* tail;
+    size_t m_size;
 
 public:
     LinkedList()
-        : head(nullptr), tail(nullptr), _size(0) {
+        : head(nullptr), tail(nullptr), m_size(0) {
     }
 
     ~LinkedList()
     {
-        Node<T>* temp = head;
-        while (temp != nullptr)
-        {
-            Node<T>* next = temp->GetNext();
-            delete temp;
-            temp = next;
-        }
-        _size = 0;
+        clear();
     }
 
-public:
-    void InsertFirst(const T& value)
+    LinkedList(const LinkedList& other)
+        : head(nullptr), tail(nullptr), m_size(0)
     {
-        if (IsEmpty())
+        Node* current = other.head;
+        while (current)
         {
-            InsertTheFirstNode(value);
-            return;
+            push_back(current->value);
+            current = current->next;
         }
-
-        Node<T>* newNode = new Node<T>(value);
-
-        newNode->SetNext(head);
-        head->SetPrev(newNode);
-
-        head = newNode;
-
-        _size++;
     }
 
-    void InsertLast(const T& value)
+    LinkedList& operator=(const LinkedList& other)
     {
-        if (IsEmpty())
+        if (this == &other)
+            return *this;
+
+        clear();
+
+        Node* current = other.head;
+        while (current)
         {
-            InsertTheFirstNode(value);
-            return;
+            push_back(current->value);
+            current = current->next;
         }
 
-        Node<T>* newNode = new Node<T>(value);
-
-        tail->SetNext(newNode);
-        newNode->SetPrev(tail);
-
-        tail = newNode;
-
-        _size++;
+        return *this;
     }
 
-    void InsertAtPosition(const T& value, size_t position)
+    LinkedList(LinkedList&& other) noexcept
+        : head(other.head), tail(other.tail), m_size(other.m_size)
     {
-        if (position > _size)
+        other.head = nullptr;
+        other.tail = nullptr;
+        other.m_size = 0;
+    }
+
+    LinkedList& operator=(LinkedList&& other) noexcept
+    {
+        if (this == &other)
+            return *this;
+
+        clear();
+
+        head = other.head;
+        tail = other.tail;
+        m_size = other.m_size;
+
+        other.head = nullptr;
+        other.tail = nullptr;
+        other.m_size = 0;
+
+        return *this;
+    }
+
+    T& front()
+    {
+        if (empty()) throw std::runtime_error("List is empty");
+        return head->value;
+    }
+
+    const T& front() const
+    {
+        if (empty()) throw std::runtime_error("List is empty");
+        return head->value;
+    }
+
+    T& back()
+    {
+        if (empty()) throw std::runtime_error("List is empty");
+        return tail->value;
+    }
+
+    const T& back() const
+    {
+        if (empty()) throw std::runtime_error("List is empty");
+        return tail->value;
+    }
+
+    // ---------------- Iterators ----------------
+    Node* begin() { return head; }
+    const Node* begin() const { return head; }
+
+    Node* end() { return nullptr; }             // tail->next = null
+    const Node* end() const { return nullptr; } // tail->next = null
+
+    // ---------------- Insert ----------------
+    void push_front(const T& value)
+    {
+        Node* node = new Node(value);
+
+        if (empty())
+        {
+            head = tail = node;
+        }
+        else
+        {
+            node->next = head;
+            head->prev = node;
+            head = node;
+        }
+
+        ++m_size;
+    }
+
+    void push_back(const T& value)
+    {
+        Node* node = new Node(value);
+
+        if (empty())
+        {
+            head = tail = node;
+        }
+        else
+        {
+            tail->next = node;
+            node->prev = tail;
+            tail = node;
+        }
+
+        ++m_size;
+    }
+
+    void insert(size_t position, const T& value)
+    {
+        if (position > m_size)
             throw std::out_of_range("Position out of range");
 
         if (position == 0)
         {
-            InsertFirst(value);
+            push_front(value);
             return;
         }
 
-        if (position == _size)
+        if (position == m_size)
         {
-            InsertLast(value);
+            push_back(value);
             return;
         }
 
-        Node<T>* temp = GetNode(position - 1);
+        Node* current = head;
 
-        Node<T>* newNode = new Node<T>(value);
-        Node<T>* nextNode = temp->GetNext();
+        for (size_t i = 0; i < position; i++)
+        {
+            current = current->next;
+        }
 
-        newNode->SetNext(nextNode);
-        newNode->SetPrev(temp);
+        Node* newNode = new Node(value);
 
-        temp->SetNext(newNode);
-        nextNode->SetPrev(newNode);
+        Node* prevNode = current->prev;
 
-        _size++;
+        // connect new node
+        newNode->next = current;
+        newNode->prev = prevNode;
+
+        prevNode->next = newNode;
+        current->prev = newNode;
+
+        ++m_size;
     }
 
-    void DeleteFirst()
+    // ---------------- Delete ----------------
+    void pop_front()
     {
-        if (IsEmpty())
-            throw std::runtime_error("List is empty");
+        if (empty()) throw std::runtime_error("List is empty");
 
-        if (_size == 1)
-        {
-            delete head;
+        Node* temp = head;
+        head = head->next;
 
-            head = nullptr;
+        if (head)
+            head->prev = nullptr;
+        else
             tail = nullptr;
 
-            _size--;
-
-            return;
-        }
-
-        Node<T>* nodeToDelete = head;
-
-        head = head->GetNext();
-        head->SetPrev(nullptr);
-
-        delete nodeToDelete;
-
-        _size--;
+        delete temp;
+        --m_size;
     }
 
-    void DeleteLast()
+    void pop_back()
     {
-        if (IsEmpty())
-            throw std::runtime_error("List is empty");
+        if (empty()) throw std::runtime_error("List is empty");
 
-        if (_size == 1)
-        {
-            delete head;
+        Node* temp = tail;
+        tail = tail->prev;
 
+        if (tail)
+            tail->next = nullptr;
+        else
             head = nullptr;
-            tail = nullptr;
 
-            _size--;
-
-            return;
-        }
-
-        Node<T>* nodeToDelete = tail;
-
-        tail = tail->GetPrev();
-        tail->SetNext(nullptr);
-
-        delete nodeToDelete;
-
-        _size--;
+        delete temp;
+        --m_size;
     }
 
-    void DeleteAtPosition(size_t position)
+    void erase(size_t index)
     {
-        if (IsEmpty())
-            throw std::runtime_error("List is empty");
-
-        if (position >= _size)
-            throw std::out_of_range("Position out of range");
-
-        if (position == 0)
-        {
-            DeleteFirst();
-            return;
-        }
-
-        if (position == _size - 1)
-        {
-            DeleteLast();
-            return;
-        }
-
-        Node<T>* temp = GetNode(position - 1);
-
-        Node<T>* nodeToDelete = temp->GetNext();
-        Node<T>* nextNode = nodeToDelete->GetNext();
-
-        temp->SetNext(nextNode);
-        nextNode->SetPrev(temp);
-
-        delete nodeToDelete;
-
-        _size--;
-    }
-
-    bool IsEmpty() const
-    {
-        return _size == 0;
-    }
-
-    size_t size() const
-    {
-        return _size;
-    }
-
-    T& operator[](size_t index)
-    {
-        return GetElement(index);
-    }
-    const T& operator[](size_t index) const
-    {
-        return GetElement(index);
-    }
-
-    T* begin() { return head; }
-    const T* begin() const { return head; }
-
-    T* end() { return tail; }
-    const T* end() const { return tail; }
-
-    void Reverse()
-    {
-
-    }
-
-    void clean()
-    {
-        while (_size > 0)
-        {
-            DeleteFirst();
-        }
-    }
-
-private:
-    void InsertTheFirstNode(const T& value)
-    {
-        Node<T>* newNode = new Node<T>(value);
-
-        head = newNode;
-        tail = newNode;
-
-        _size++;
-    }
-
-    T& GetElement(size_t index) const
-    {
-        Node<T>* node = GetNode(index);
-
-        if (node == nullptr)
+        if (index >= m_size)
             throw std::out_of_range("Index out of range");
 
-        return node->GetValue();
-    }
-
-protected:
-    Node<T>* GetNode(size_t index) const
-    {
-        if (index >= _size || index < 0)
-            return nullptr;
-
-        Node<T>* temp = head;
-
-        for (size_t i = 0; i < index; i++)
+        if (index == 0)
         {
-            temp = temp->GetNext();
+            pop_front();
+            return;
         }
 
-        return temp;
+        if (index == m_size - 1)
+        {
+            pop_back();
+            return;
+        }
+
+        Node* curr = head;
+        for (size_t i = 0; i < index; i++)
+            curr = curr->next;
+
+        curr->prev->next = curr->next;
+        curr->next->prev = curr->prev;
+
+        delete curr;
+        --m_size;
     }
+
+    void clear()
+    {
+        while (head)
+        {
+            Node* temp = head;
+            head = head->next;
+            delete temp;
+        }
+
+        tail = nullptr;
+        m_size = 0;
+    }
+
+    void reverse()
+    {
+        Node* current = head;
+        Node* temp = nullptr;
+
+        while (current)
+        {
+            temp = current->prev;
+            current->prev = current->next;
+            current->next = temp;
+
+            current = current->prev;
+        }
+
+        temp = head;
+        head = tail;
+        tail = temp;
+    }
+
+    // ---------------- get element (O(n)) ----------------
+    T& getElement(size_t index)
+    {
+        Node* curr = head;
+        for (size_t i = 0; i < index; i++)
+            curr = curr->next;
+
+        return curr->value;
+    }
+
+    const T& getElement(size_t index) const
+    {
+        Node* curr = head;
+        for (size_t i = 0; i < index; i++)
+            curr = curr->next;
+
+        return curr->value;
+    }
+
+    size_t size() const { return m_size; }
+    bool empty() const { return m_size == 0; }
 };

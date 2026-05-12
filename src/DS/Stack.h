@@ -1,22 +1,60 @@
 #pragma once
-#include "Queue.h"
+#include "DynamicArray.h"
+#include "IStack.h"
+#include <stdexcept>
 
 template<class T>
-class Stack : public Queue<T>
+class Stack : public IStack<T>
 {
+private:
+    DynamicArray<T> m_List;
+
 public:
-	void push(const T& item) override
-	{
-		Queue <T>::m_List.InsertFirst(item);
-	}
+    void push(const T& item)
+    {
+        m_List.push_back(item);
+    }
 
-	T top()
-	{
-		return Queue <T>::front();
-	}
+    void pop()
+    {
+        if (empty())
+            throw std::runtime_error("Stack is empty");
 
-	T bottom()
-	{
-		return Queue <T>::back();
-	}
+        m_List.erase(m_List.size() - 1);
+    }
+
+    T& top()
+    {
+        if (empty())
+            throw std::runtime_error("Stack is empty");
+
+        return m_List[m_List.size() - 1];
+    }
+
+    const T& top() const
+    {
+        if (empty())
+            throw std::runtime_error("Stack is empty");
+
+        return m_List[m_List.size() - 1];
+    }
+
+    T& getElement(size_t index)
+    {
+        return m_List.getElement(index);
+    }
+
+    const T& getElement(size_t index) const
+    {
+        return m_List.getElement(index);
+    }
+
+    void clear()
+    {
+        m_List.clear();
+    }
+
+    size_t size() const { return m_List.size(); }
+    bool empty() const { return m_List.size() == 0; }
+
 };

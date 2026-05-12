@@ -1,59 +1,67 @@
 #pragma once
+#include "IQueue.h"
 #include "DynamicArray.h"
 
 template<class T>
-class QueueArr
+class QueueArr : public IQueue
 {
 protected:
-	DynamicArray<T> m_DArray;
+    DynamicArray<T> m_DArray;
+
 public:
-	size_t size() const { return m_DArray.size(); }
+    void push(const T& value)
+    {
+        m_DArray.push_back(value);
+    }
 
-	virtual void push(const T& value)
-	{
-		m_DArray.InsertLast(value);
-	}
+    void pop()
+    {
+        if (empty())
+            throw std::out_of_range("Queue is empty");
 
-	virtual void pop()
-	{
-		m_DArray.DeleteFirst();
-	}
+        m_DArray.erase(0);
+    }
 
-	void InsertAtFront(const T& value)
-	{
-		m_DArray.InsertFirst(value);
-	}
+    T& front()
+    {
+        return m_DArray[0];
+    }
 
-	void InsertAtBack(const T& value)
-	{
-		m_DArray.InsertLast(value);
-	}
+    const T& front() const
+    {
+        return m_DArray[0];
+    }
 
-	void InsertAtPosition(const T& value, size_t position)
-	{
-		m_DArray.InsertAtPosition(value, position);
-	}
+    T& back()
+    {
+        return m_DArray[m_DArray.size() - 1];
+    }
 
+    const T& back() const
+    {
+        return m_DArray[m_DArray.size() - 1];
+    }
 
-	T front() const { return m_DArray[0]; }
-	T back() const { return m_DArray[size() - 1]; }
+    T& operator[](size_t index)
+    {
+        return m_DArray[index];
+    }
 
-	T& operator[](size_t index)
-	{
-		return m_DArray[index];
-	}
-	const T& operator[](size_t index) const
-	{
-		return m_DArray[index];
-	}
+    const T& operator[](size_t index) const
+    {
+        return m_DArray[index];
+    }
 
-	void Reverse()
-	{
-		m_DArray.Reverse();
-	}
+    void clear()
+    {
+        m_DArray.clear();
+    }
 
-	void clear()
-	{
-		m_DArray.clear();
-	}
+    void reverse()
+    {
+        m_DArray.reverse();
+    }
+
+    size_t size() const { return m_DArray.size(); }
+    bool empty() const { return m_DArray.empty(); }
 };

@@ -45,5 +45,11 @@
     <ClInclude Include="src\DS\StackArr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\DS\IStack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DS\IQueue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,215 +1,231 @@
 #pragma once
-
-#include "Array.h"
 #include <stdexcept>
 
-template<class T>
+template <typename T>
 class DynamicArray
 {
 private:
-	T* _tempArray;
-	T* m_Array;
-	size_t _size;
+    T* m_data;
+    size_t m_size;
+    size_t m_capacity;
+
+    void reallocate(size_t newCapacity)
+    {
+        T* newData = new T[newCapacity];
+
+        for (size_t i = 0; i < m_size; i++)
+        {
+            newData[i] = m_data[i];
+        }
+
+        delete[] m_data;
+        m_data = newData;
+        m_capacity = newCapacity;
+    }
+
+    void swap(T& a, T& b)
+    {
+        T temp = a;
+        a = b;
+        b = temp;
+    }
+
 public:
-	DynamicArray(size_t size = 0)
-	{
-		if (size < 0)
-			size = 0;
+    // ---------------- Constructor ----------------
+    DynamicArray()
+        : m_data(nullptr), m_size(0), m_capacity(0)
+    {
+    }
 
-		_size = size;
-		m_Array = new T[size]; // allocate object on the heap
-	}
+    explicit DynamicArray(size_t capacity)
+        : m_data(nullptr), m_size(0), m_capacity(capacity)
+    {
+        if (m_capacity > 0)
+            m_data = new T[m_capacity];
+    }
 
-	~DynamicArray()
-	{
-		delete[] m_Array;
-	}
+    // ---------------- Destructor ----------------
+    ~DynamicArray()
+    {
+        delete[] m_data;
+    }
 
-	T& operator[](size_t index)
-	{
-		return GetElement(index);
-	}
-	const T& operator[](size_t index) const
-	{
-		GetElement(index);
-	}
+    // ---------------- Copy Constructor ----------------
+    DynamicArray(const DynamicArray& other)
+        : m_data(nullptr), m_size(other.m_size), m_capacity(other.m_capacity)
+    {
+        if (m_capacity > 0)
+            m_data = new T[m_capacity];
 
-	T* Data() { return m_Array; }
-	const T* Data() const { return m_Array; }
+        for (size_t i = 0; i < m_size; i++)
+        {
+            m_data[i] = other.m_data[i];
+        }
+    }
 
-	T* begin() { return m_Array; }
-	const T* begin() const { return m_Array; }
+    // ---------------- Copy Assignment ----------------
+    DynamicArray& operator=(const DynamicArray& other)
+    {
+        if (this == &other)
+            return *this;
 
-	T* end() { return m_Array + _size; }
-	const T* end() const { return m_Array + _size; }
+        T* newData = nullptr;
 
-	size_t size()
-	{
-		return _size;
-	}
+        if (other.m_capacity > 0)
+        {
+            newData = new T[other.m_capacity];
 
-	bool isEmpty()
-	{
-		return (_size <= 0);
-	}
+            for (size_t i = 0; i < other.m_size; i++)
+            {
+                newData[i] = other.m_data[i];
+            }
+        }
 
-	void Resize(unsigned int newSize)
-	{
-		if (newSize < 0)
-			newSize = 0;
+        delete[] m_data;
 
-		if (newSize == _size) // no need to resize
-			return;
+        m_data = newData;
+        m_size = other.m_size;
+        m_capacity = other.m_capacity;
 
-		_tempArray = new T[_size];
+        return *this;
+    }
 
-		int minSize = Min(_size, newSize);
-		// Copy all the data form the original array
-		for (int i = 0; i < minSize; i++)
-		{
-			_tempArray[i] = m_Array[i];
-		}
+    // ---------------- Move Constructor ----------------
+    DynamicArray(DynamicArray&& other) noexcept
+        : m_data(other.m_data),
+        m_size(other.m_size),
+        m_capacity(other.m_capacity)
+    {
+        other.m_data = nullptr;
+        other.m_size = 0;
+        other.m_capacity = 0;
+    }
 
-		delete[] m_Array;
-		m_Array = _tempArray;
-		_size = newSize;
-	}
+    // ---------------- Move Assignment ----------------
+    DynamicArray& operator=(DynamicArray&& other) noexcept
+    {
+        if (this == &other)
+            return *this;
 
-	void InsertAtPosition(size_t index, const T& value)
-	{
-		if (index < 0 || index > _size)
-			throw std::out_of_range("index is out of range!");
+        delete[] m_data;
 
-		++_size;
-		_tempArray = new T[_size];
+        m_data = other.m_data;
+        m_size = other.m_size;
+        m_capacity = other.m_capacity;
 
-		//Copy befor index
-		for (int i = 0; i < index; i++)
-		{
-			_tempArray[i] = m_Array[i];
-		}
-		_tempArray[index] = value;
-		//Copy after index
-		for (int i = index; i < _size - 1; i++)
-		{
-			_tempArray[i + 1] = m_Array[i];
-		}
+        other.m_data = nullptr;
+        other.m_size = 0;
+        other.m_capacity = 0;
 
-		delete[] m_Array;
-		m_Array = _tempArray;
-	}
+        return *this;
+    }
 
-	void InsertFirst(const T& value)
-	{
-		InsertAtPosition(0, value);
-	}
-	void InsertLast(const T& value)
-	{
-		InsertAtPosition(_size, value);
-	}
+    // ---------------- Element Access ----------------
+    T& operator[](size_t index)
+    {
+        return m_data[index];
+    }
 
-	void DeleteLast()
-	{
-		DeleteAtPosition(_size - 1);
-	}
+    const T& operator[](size_t index) const
+    {
+        return m_data[index];
+    }
 
-	void DeleteFirst()
-	{
-		DeleteAtPosition(0);
-	}
+    T& at(size_t index)
+    {
+        if (index >= m_size)
+            throw std::out_of_range("Index out of range");
+        return m_data[index];
+    }
 
-	void DeleteAtPosition(size_t index)
-	{
-		if (index < 0 || index >= _size)
-			throw std::out_of_range("Invailed position");
+    const T& at(size_t index) const
+    {
+        if (index >= m_size)
+            throw std::out_of_range("Index out of range");
+        return m_data[index];
+    }
 
-		// delete in the middle
-		_size--;
-		_tempArray = new T[_size];
+    // ---------------- Capacity ----------------
+    size_t size() const { return m_size; }
+    size_t capacity() const { return m_capacity; }
+    bool empty() const { return m_size == 0; }
 
-		// Copy before index
-		for (int i = 0; i < index; i++)
-		{
-			_tempArray[i] = m_Array[i];
-		}
-		// Copy after index
-		for (int i = index + 1; i < _size + 1; i++)
-		{
-			_tempArray[i - 1] = m_Array[i];
-		}
+    // ---------------- Iterators ----------------
+    T* begin() { return m_data; }
+    const T* begin() const { return m_data; }
 
-		delete[] m_Array;
-		m_Array = _tempArray;
-	}
+    T* end() { return m_data + m_size; }
+    const T* end() const { return m_data + m_size; }
 
-	void DeleteItem(const T& value)
-	{
-		int index = Find(value);
+    T* data() { return m_data; }
+    const T* data() const { return m_data; }
 
-		if (index < 0)
-		{
-			return;
-		}
-		DeleteAtPosition();
-	}
+    // ---------------- Modifiers ----------------
+    void push_back(const T& value)
+    {
+        if (m_size >= m_capacity)
+        {
+            size_t newCapacity = (m_capacity == 0) ? 1 : m_capacity * 2;
+            reallocate(newCapacity);
+        }
 
-	size_t Find(const T& value)
-	{
-		for (int i = 0; i < size(); i++)
-		{
-			if (m_Array[i] == value)
-				return i;
-		}
+        m_data[m_size++] = value;
+    }
 
-		return -1;
-	}
+    void pop_back()
+    {
+        if (m_size == 0)
+            throw std::out_of_range("Array is empty");
 
+        --m_size;
+    }
 
+    void insert(size_t index, const T& value)
+    {
+        if (index > m_size)
+            throw std::out_of_range("Index out of range");
 
-	void Reverse()
-	{
-		T* _arr = new T[size()];
+        if (m_size >= m_capacity)
+        {
+            size_t newCapacity = (m_capacity == 0) ? 1 : m_capacity * 2;
+            reallocate(newCapacity);
+        }
 
-		for (int i = 0; i < size(); i++)
-		{
-			_arr[i] = m_Array[size() - 1 - i];
-		}
-		
-		delete m_Array;
-		m_Array = _arr;
-	}
+        for (size_t i = m_size; i > index; --i)
+        {
+            m_data[i] = m_data[i - 1];
+        }
 
-	void clear()
-	{
-		_size = 0;
-		delete[] m_Array;
-		_tempArray = new T[0];
-		m_Array = _tempArray;
-	}
+        m_data[index] = value;
+        ++m_size;
+    }
 
-	DynamicArray<T> clone()
-	{
-		DynamicArray<T> clonedArray(_size);
+    void erase(size_t index)
+    {
+        if (index >= m_size)
+            throw std::out_of_range("Index out of range");
 
-		for (int i = 0; i < _size; i++)
-		{
-			clonedArray[i] = m_Array[i];
-		}
+        for (size_t i = index; i < m_size - 1; ++i)
+        {
+            m_data[i] = m_data[i + 1];
+        }
 
-		return clonedArray;
-	}
+        --m_size;
+    }
 
-private:
-	size_t Min(size_t a, size_t b)
-	{
-		return (a > b) ? b : a;
-	}
+    void clear()
+    {
+        m_size = 0;
+        m_capacity = 0;
+        delete[] m_data;
+        m_data = nullptr;
+    }
 
-	T& GetElement(size_t index) const
-	{
-		if (index >= _size || index < 0)
-			throw std::out_of_range("Position out of range");
-
-		return *(m_Array + index);
-	}
+    void reverse()
+    {
+        for (size_t i = 0; i < m_size / 2; i++)
+        {
+            swap(m_data[i], m_data[m_size - 1 - i]);
+        }
+    }
 };

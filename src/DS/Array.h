@@ -26,18 +26,6 @@ public:
 	T* end() { return m_data + _size; }
 	const T* end() const { return m_data + _size; }
 
-	Array<T, _size> clone()
-	{
-		Array<T, _size> clonedArray;
-
-		for (int i = 0; i < _size; i++)
-		{
-			clonedArray[i] = m_data[i];
-		}
-
-		return clonedArray;
-	}
-
 private:
 	T m_data[_size];
 };

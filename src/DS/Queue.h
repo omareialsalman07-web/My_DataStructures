@@ -1,59 +1,75 @@
 #pragma once
+#include "IQueue.h"
 #include "LinkedList.h"
+#include <stdexcept>
 
 template<class T>
-class Queue
+class Queue : public IQueue<T>
 {
 protected:
-	LinkedList<T> m_List;
+    LinkedList<T> m_List;
+
 public:
-	size_t size() const { return m_List.size(); }
-	
-	virtual void push(const T& value)
-	{
-		m_List.InsertLast(value);
-	}
+    void push(const T& value)
+    {
+        m_List.push_back(value);
+    }
 
-	virtual void pop()
-	{
-		m_List.DeleteFirst();
-	}
+    void pop()
+    {
+        if (empty())
+            throw std::runtime_error("Queue is empty");
 
-	void InsertAtFront(const T& value)
-	{
-		m_List.InsertFirst(value);
-	}
+        m_List.pop_front();
+    }
 
-	void InsertAtBack(const T& value)
-	{
-		m_List.InsertLast(value);
-	}
+    T& front()
+    {
+        if (empty())
+            throw std::runtime_error("Queue is empty");
 
-	void InsertAtPosition(const T& value, size_t position)
-	{
-		m_List.InsertAtPosition(value, position);
-	}
+        return m_List.front();
+    }
 
+    const T& front() const
+    {
+        if (empty())
+            throw std::runtime_error("Queue is empty");
 
-	T front() const { return m_List[0]; }
-	T back() const { return m_List[size() - 1]; }
+        return m_List.front();
+    }
 
-	T& operator[](size_t index)
-	{
-		return m_List[index];
-	}
-	const T& operator[](size_t index) const
-	{
-		return m_List[index];
-	}
+    T& back()
+    {
+        if (empty())
+            throw std::runtime_error("Queue is empty");
 
-	void Reverse()
-	{
-		m_List.Reverse();
-	}
-	
-	void clear()
-	{
-		m_List.clean();
-	}
+        return m_List.back();
+    }
+
+    const T& back() const
+    {
+        if (empty())
+            throw std::runtime_error("Queue is empty");
+
+        return m_List.back();
+    }
+
+    T& getElement(size_t index)
+    {
+        return m_List.getElement(index);
+    }
+
+    const T& getElement(size_t index) const
+    {
+        return m_List.getElement(index);
+    }
+
+    void clear()
+    {
+        m_List.clear();
+    }
+
+    size_t size() const { return m_List.size(); }
+    bool empty() const { return m_List.empty(); }
 };
