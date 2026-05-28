@@ -16,6 +16,7 @@ private:
         Node* right;
 
         Node(const T& v) : value(v), left(nullptr), right(nullptr) {}
+        Node(T&& others) : value(std::move(others)), left(nullptr), right(nullptr) {}
     };
 
     Node* m_root;
@@ -30,6 +31,19 @@ private:
             node->left = insert(node->left, value);
         else
             node->right = insert(node->right, value);
+
+        return node;
+    }
+
+    Node* insert(Node* node, T&& value)
+    {
+        if (!node)
+            return new Node(std::move(value));
+
+        if (value < node->value)
+            node->left = insert(node->left, std::move(value));
+        else
+            node->right = insert(node->right, std::move(value));
 
         return node;
     }
@@ -190,8 +204,13 @@ public:
 public:
     BinarySearchTree() : m_root(nullptr), m_size(0) {}
 
-    BinarySearchTree(const BinarySearchTree& other)
-        : m_root(clone(other.m_root)), m_size(other.m_size) {}
+    BinarySearchTree(BinarySearchTree&& other) noexcept
+        : m_root(other.m_root),
+        m_size(other.m_size)
+    {
+        other.m_root = nullptr;
+        other.m_size = 0;
+    }
 
     BinarySearchTree& operator=(const BinarySearchTree& other)
     {
@@ -204,6 +223,30 @@ public:
         return *this;
     }
 
+    BinarySearchTree(BinarySearchTree&& other) noexcept
+        : m_root(other.m_root),
+        m_size(other.m_size)
+    {
+        other.m_root = nullptr;
+        other.m_size = 0;
+    }
+
+    BinarySearchTree& operator=(BinarySearchTree&& others) noexcept
+    {
+        if (this == &others)
+            return *this;
+
+        clear(m_root);
+
+        m_root = others.m_root;
+        m_size = others.m_size;
+
+        others.m_root = nullptr;
+        others.m_size = 0;
+
+        return *this;
+    }
+
     ~BinarySearchTree()
     {
         clear(m_root);
@@ -212,6 +255,12 @@ public:
     void insert(const T& value)
     {
         m_root = insert(m_root, value);
+        ++m_size;
+    }
+
+    void insert(T&& value)
+    {
+        m_root = insert(m_root, std::move(value));
         ++m_size;
     }
 
