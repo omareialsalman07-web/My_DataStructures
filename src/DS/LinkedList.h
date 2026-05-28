@@ -22,15 +22,9 @@ private:
         Node* current;
 
     public:
-        Iterator(Node* node = nullptr)
-            : current(node) {
-        }
+        Iterator(Node* node) : current(node) {}
 
-        T& operator*()
-        {
-            return current->value;
-        }
-
+        // READ access (const-safe)
         const T& operator*() const
         {
             return current->value;
@@ -47,49 +41,17 @@ private:
         {
             return current != other.current;
         }
-
-        bool operator==(const Iterator& other) const
-        {
-            return current == other.current;
-        }
-    };
-
-    class ConstIterator
-    {
-    private:
-        const Node* current;
-
-    public:
-        ConstIterator(const Node* node = nullptr)
-            : current(node) {
-        }
-
-        const T& operator*() const
-        {
-            return current->value;
-        }
-
-        ConstIterator& operator++()
-        {
-            if (current)
-                current = current->next;
-            return *this;
-        }
-
-        bool operator!=(const ConstIterator& other) const
-        {
-            return current != other.current;
-        }
     };
 
 
-    Node* head;
-    Node* tail;
+
+    Node* m_head;
+    Node* m_tail;
     size_t m_size;
 
 public:
     LinkedList()
-        : head(nullptr), tail(nullptr), m_size(0) {
+        : m_head(nullptr), m_tail(nullptr), m_size(0) {
     }
 
     ~LinkedList()
@@ -98,9 +60,9 @@ public:
     }
 
     LinkedList(const LinkedList& other)
-        : head(nullptr), tail(nullptr), m_size(0)
+        : m_head(nullptr), m_tail(nullptr), m_size(0)
     {
-        Node* current = other.head;
+        Node* current = other.m_head;
         while (current)
         {
             push_back(current->value);
@@ -115,7 +77,7 @@ public:
 
         clear();
 
-        Node* current = other.head;
+        Node* current = other.m_head;
         while (current)
         {
             push_back(current->value);
@@ -126,10 +88,10 @@ public:
     }
 
     LinkedList(LinkedList&& other) noexcept
-        : head(other.head), tail(other.tail), m_size(other.m_size)
+        : m_head(other.m_head), m_tail(other.m_tail), m_size(other.m_size)
     {
-        other.head = nullptr;
-        other.tail = nullptr;
+        other.m_head = nullptr;
+        other.m_tail = nullptr;
         other.m_size = 0;
     }
 
@@ -140,12 +102,12 @@ public:
 
         clear();
 
-        head = other.head;
-        tail = other.tail;
+        m_head = other.m_head;
+        m_tail = other.m_tail;
         m_size = other.m_size;
 
-        other.head = nullptr;
-        other.tail = nullptr;
+        other.m_head = nullptr;
+        other.m_tail = nullptr;
         other.m_size = 0;
 
         return *this;
@@ -154,35 +116,31 @@ public:
     T& front()
     {
         if (empty()) throw std::runtime_error("List is empty");
-        return head->value;
+        return m_head->value;
     }
 
     const T& front() const
     {
         if (empty()) throw std::runtime_error("List is empty");
-        return head->value;
+        return m_head->value;
     }
 
     T& back()
     {
         if (empty()) throw std::runtime_error("List is empty");
-        return tail->value;
+        return m_tail->value;
     }
 
     const T& back() const
     {
         if (empty()) throw std::runtime_error("List is empty");
-        return tail->value;
+        return m_tail->value;
     }
 
     // ---------------- Iterators ----------------
-    Iterator begin() { return Iterator(head); }
+    Iterator begin() const { return Iterator(m_head); }
 
-    Iterator end(){ return Iterator(nullptr);}
-
-    ConstIterator begin() const { return ConstIterator(head); }
-
-    ConstIterator end() const { return ConstIterator(nullptr); }// tail->next = null
+    Iterator end() const { return Iterator(nullptr); }
 
     // ---------------- Insert ----------------
     void push_front(const T& value)
@@ -191,13 +149,13 @@ public:
 
         if (empty())
         {
-            head = tail = node;
+            m_head = m_tail = node;
         }
         else
         {
-            node->next = head;
-            head->prev = node;
-            head = node;
+            node->next = m_head;
+            m_head->prev = node;
+            m_head = node;
         }
 
         ++m_size;
@@ -209,13 +167,13 @@ public:
 
         if (empty())
         {
-            head = tail = node;
+            m_head = m_tail = node;
         }
         else
         {
-            tail->next = node;
-            node->prev = tail;
-            tail = node;
+            m_tail->next = node;
+            node->prev = m_tail;
+            m_tail = node;
         }
 
         ++m_size;
@@ -238,7 +196,7 @@ public:
             return;
         }
 
-        Node* current = head;
+        Node* current = m_head;
 
         for (size_t i = 0; i < position; i++)
         {
@@ -264,13 +222,13 @@ public:
     {
         if (empty()) throw std::runtime_error("List is empty");
 
-        Node* temp = head;
-        head = head->next;
+        Node* temp = m_head;
+        m_head = m_head->next;
 
-        if (head)
-            head->prev = nullptr;
+        if (m_head)
+            m_head->prev = nullptr;
         else
-            tail = nullptr;
+            m_tail = nullptr;
 
         delete temp;
         --m_size;
@@ -280,13 +238,13 @@ public:
     {
         if (empty()) throw std::runtime_error("List is empty");
 
-        Node* temp = tail;
-        tail = tail->prev;
+        Node* temp = m_tail;
+        m_tail = m_tail->prev;
 
-        if (tail)
-            tail->next = nullptr;
+        if (m_tail)
+            m_tail->next = nullptr;
         else
-            head = nullptr;
+            m_head = nullptr;
 
         delete temp;
         --m_size;
@@ -309,7 +267,7 @@ public:
             return;
         }
 
-        Node* curr = head;
+        Node* curr = m_head;
         for (size_t i = 0; i < index; i++)
             curr = curr->next;
 
@@ -322,20 +280,20 @@ public:
 
     void clear()
     {
-        while (head)
+        while (m_head)
         {
-            Node* temp = head;
-            head = head->next;
+            Node* temp = m_head;
+            m_head = m_head->next;
             delete temp;
         }
 
-        tail = nullptr;
+        m_tail = nullptr;
         m_size = 0;
     }
 
     void reverse()
     {
-        Node* current = head;
+        Node* current = m_head;
         Node* temp = nullptr;
 
         while (current)
@@ -347,15 +305,15 @@ public:
             current = current->prev;
         }
 
-        temp = head;
-        head = tail;
-        tail = temp;
+        temp = m_head;
+        m_head = m_tail;
+        m_tail = temp;
     }
 
     // ---------------- get element (O(n)) ----------------
     T& getElement(size_t index)
     {
-        Node* curr = head;
+        Node* curr = m_head;
         for (size_t i = 0; i < index; i++)
             curr = curr->next;
 
@@ -364,7 +322,7 @@ public:
 
     const T& getElement(size_t index) const
     {
-        Node* curr = head;
+        Node* curr = m_head;
         for (size_t i = 0; i < index; i++)
             curr = curr->next;
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "DynamicArray.h"
+#include "LinkedList.h"
 #include "IStack.h"
 #include <stdexcept>
 
@@ -7,7 +7,7 @@ template<class T>
 class Stack : public IStack<T>
 {
 private:
-    DynamicArray<T> m_List;
+    LinkedList<T> m_List;
 
 public:
     void push(const T& item)
@@ -28,7 +28,7 @@ public:
         if (empty())
             throw std::runtime_error("Stack is empty");
 
-        return m_List[m_List.size() - 1];
+        return m_List.front();
     }
 
     const T& top() const
@@ -36,7 +36,7 @@ public:
         if (empty())
             throw std::runtime_error("Stack is empty");
 
-        return m_List[m_List.size() - 1];
+        return m_List.front();
     }
 
     T& getElement(size_t index)

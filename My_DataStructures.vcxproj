@@ -151,6 +151,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\DS\Array.h" />
+    <ClInclude Include="src\DS\BinarySearchTree.h" />
     <ClInclude Include="src\DS\DynamicArray.h" />
     <ClInclude Include="src\DS\IQueue.h" />
     <ClInclude Include="src\DS\IStack.h" />
@@ -159,6 +160,7 @@
     <ClInclude Include="src\DS\QueueArr.h" />
     <ClInclude Include="src\DS\Stack.h" />
     <ClInclude Include="src\DS\StackArr.h" />
+    <ClInclude Include="src\Test\String.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
