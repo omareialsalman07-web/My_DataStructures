@@ -204,12 +204,10 @@ public:
 public:
     BinarySearchTree() : m_root(nullptr), m_size(0) {}
 
-    BinarySearchTree(BinarySearchTree&& other) noexcept
-        : m_root(other.m_root),
-        m_size(other.m_size)
+    BinarySearchTree(BinarySearchTree& other)
     {
-        other.m_root = nullptr;
-        other.m_size = 0;
+        m_root = clone(other.m_root);
+        m_size = other.m_size;
     }
 
     BinarySearchTree& operator=(const BinarySearchTree& other)

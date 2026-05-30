@@ -42,6 +42,7 @@ public:
     {
         if (m_capacity > 0)
             m_data = new T[m_capacity];
+        
     }
 
     // ---------------- Destructor ----------------
@@ -123,12 +124,12 @@ public:
     // ---------------- Element Access ----------------
     T& operator[](size_t index)
     {
-        return m_data[index];
+        return at(index);
     }
 
     const T& operator[](size_t index) const
     {
-        return m_data[index];
+        return at(index);
     }
 
     T& at(size_t index)
@@ -211,6 +212,21 @@ public:
         }
 
         --m_size;
+    }
+
+    int find(const T& value) const
+    {
+        for (size_t i = 0; i < m_size; i++)
+        {
+            if (m_data[i] == value)
+                return static_cast<int>(i);
+        }
+        return -1;
+    }
+
+    bool contains(const T& value) const
+    {
+        return find(value) != -1;
     }
 
     void clear()
