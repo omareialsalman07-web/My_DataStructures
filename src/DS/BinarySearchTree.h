@@ -15,8 +15,8 @@ private:
         Node* left;
         Node* right;
 
-        Node(const T& v) : value(v), left(nullptr), right(nullptr) {}
-        Node(T&& others) : value(std::move(others)), left(nullptr), right(nullptr) {}
+        Node(const T& v)
+            : value(v), left(nullptr), right(nullptr) {}
     };
 
     Node* m_root;
@@ -25,25 +25,13 @@ private:
 private:
     Node* insert(Node* node, const T& value)
     {
-        if (!node) return new Node(value);
+        if (!node)
+            return new Node(value);
 
         if (value < node->value)
             node->left = insert(node->left, value);
         else
             node->right = insert(node->right, value);
-
-        return node;
-    }
-
-    Node* insert(Node* node, T&& value)
-    {
-        if (!node)
-            return new Node(std::move(value));
-
-        if (value < node->value)
-            node->left = insert(node->left, std::move(value));
-        else
-            node->right = insert(node->right, std::move(value));
 
         return node;
     }
@@ -63,14 +51,20 @@ private:
     Node* findMin(Node* node) const
     {
         if (!node) return nullptr;
-        while (node->left) node = node->left;
+
+        while (node->left)
+            node = node->left;
+
         return node;
     }
 
     Node* findMax(Node* node) const
     {
         if (!node) return nullptr;
-        while (node->right) node = node->right;
+
+        while (node->right)
+            node = node->right;
+
         return node;
     }
 
@@ -86,7 +80,6 @@ private:
         {
             removed = true;
 
-            // 0 or 1 child
             if (!node->left)
             {
                 Node* r = node->right;
@@ -100,7 +93,6 @@ private:
                 return l;
             }
 
-            // 2 children
             Node* pred = findMax(node->left);
             node->value = pred->value;
 
@@ -138,6 +130,7 @@ private:
     void clear(Node* node)
     {
         if (!node) return;
+
         clear(node->left);
         clear(node->right);
         delete node;
@@ -150,11 +143,12 @@ private:
         Node* newNode = new Node(node->value);
         newNode->left = clone(node->left);
         newNode->right = clone(node->right);
+
         return newNode;
     }
 
 public:
-    class Iterator // Using BFS
+    class Iterator
     {
     private:
         Queue<Node*> q;
@@ -172,7 +166,6 @@ public:
             ++(*this);
         }
 
-        // READ ONLY ACCESS (important)
         const T& operator*() const
         {
             return current->value;
@@ -202,45 +195,26 @@ public:
     };
 
 public:
-    BinarySearchTree() : m_root(nullptr), m_size(0) {}
+    BinarySearchTree()
+        : m_root(nullptr), m_size(0) {}
 
-    BinarySearchTree(BinarySearchTree& other)
+    // Copy constructor
+    BinarySearchTree(const BinarySearchTree& other)
     {
         m_root = clone(other.m_root);
         m_size = other.m_size;
     }
 
+    // Copy assignment
     BinarySearchTree& operator=(const BinarySearchTree& other)
     {
-        if (this == &other) return *this;
-
-        clear(m_root);
-        m_root = clone(other.m_root);
-        m_size = other.m_size;
-
-        return *this;
-    }
-
-    BinarySearchTree(BinarySearchTree&& other) noexcept
-        : m_root(other.m_root),
-        m_size(other.m_size)
-    {
-        other.m_root = nullptr;
-        other.m_size = 0;
-    }
-
-    BinarySearchTree& operator=(BinarySearchTree&& others) noexcept
-    {
-        if (this == &others)
+        if (this == &other)
             return *this;
 
         clear(m_root);
 
-        m_root = others.m_root;
-        m_size = others.m_size;
-
-        others.m_root = nullptr;
-        others.m_size = 0;
+        m_root = clone(other.m_root);
+        m_size = other.m_size;
 
         return *this;
     }
@@ -253,12 +227,6 @@ public:
     void insert(const T& value)
     {
         m_root = insert(m_root, value);
-        ++m_size;
-    }
-
-    void insert(T&& value)
-    {
-        m_root = insert(m_root, std::move(value));
         ++m_size;
     }
 
@@ -286,7 +254,9 @@ public:
         bool removed = false;
         m_root = remove(m_root, value, removed);
 
-        if (removed) --m_size;
+        if (removed)
+            --m_size;
+
         return removed;
     }
 
@@ -301,7 +271,6 @@ public:
     size_t size() const { return m_size; }
 
     Iterator begin() const { return Iterator(m_root); }
-
     Iterator end() const { return Iterator(nullptr); }
 
     void dfs(SearchType type) const
@@ -312,6 +281,7 @@ public:
         case SearchType::InOrder: inorder(m_root); break;
         case SearchType::PostOrder: postorder(m_root); break;
         }
+
         std::cout << "\n";
     }
 
@@ -331,9 +301,10 @@ public:
 
             if (current->left)
                 queue.push(current->left);
+
             if (current->right)
                 queue.push(current->right);
-        }        
+        }
 
         std::cout << "\n";
     }

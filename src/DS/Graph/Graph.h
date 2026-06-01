@@ -1,13 +1,17 @@
 #pragma once
 
-#pragma once
-
 template <class T>
 class Graph
 {
 public:
-    enum class GraphDirectionType { eDirected, eUnDirected };
-    Graph(GraphDirectionType graphDirectionType)
+    enum class GraphDirectionType
+    {
+        eDirected,
+        eUnDirected
+    };
+
+public:
+    explicit Graph(GraphDirectionType graphDirectionType)
         : m_VertexCount(0),
         m_EdgeCount(0),
         m_GraphDirectionType(graphDirectionType)

@@ -1,6 +1,5 @@
 #pragma once
 #include <stdexcept>
-#include <utility>
 
 template<class T>
 class LinkedList
@@ -12,14 +11,9 @@ private:
         Node* next;
         Node* prev;
 
-        // Copy
+        // Copy only
         Node(const T& v)
             : value(v), next(nullptr), prev(nullptr)
-        {}
-
-        // Move
-        Node(T&& v)
-            : value(std::move(v)), next(nullptr), prev(nullptr)
         {}
     };
 
@@ -28,6 +22,8 @@ public:
     {
     private:
         Node* current;
+
+        friend class LinkedList<T>;
 
     public:
         Iterator(Node* node = nullptr)
@@ -76,8 +72,6 @@ private:
     size_t m_size;
 
 public:
-    // ---------------- Constructors ----------------
-
     LinkedList()
         : m_head(nullptr), m_tail(nullptr), m_size(0)
     {}
@@ -100,55 +94,23 @@ public:
         }
     }
 
-    // Move constructor
-    LinkedList(LinkedList&& other) noexcept
-        : m_head(other.m_head),
-        m_tail(other.m_tail),
-        m_size(other.m_size)
-    {
-        other.m_head = nullptr;
-        other.m_tail = nullptr;
-        other.m_size = 0;
-    }
-
     // Copy assignment
     LinkedList& operator=(const LinkedList& other)
     {
         if (this == &other)
             return *this;
 
-        LinkedList temp(other);
-        swap(temp);
+        clear();  // remove old data
+
+        Node* current = other.m_head;
+
+        while (current)
+        {
+            push_back(current->value);
+            current = current->next;
+        }
 
         return *this;
-    }
-
-    // Move assignment
-    LinkedList& operator=(LinkedList&& other) noexcept
-    {
-        if (this == &other)
-            return *this;
-
-        clear();
-
-        m_head = other.m_head;
-        m_tail = other.m_tail;
-        m_size = other.m_size;
-
-        other.m_head = nullptr;
-        other.m_tail = nullptr;
-        other.m_size = 0;
-
-        return *this;
-    }
-
-    // ---------------- Utility ----------------
-
-    void swap(LinkedList& other) noexcept
-    {
-        std::swap(m_head, other.m_head);
-        std::swap(m_tail, other.m_tail);
-        std::swap(m_size, other.m_size);
     }
 
     bool empty() const
@@ -174,8 +136,7 @@ public:
         m_size = 0;
     }
 
-    // ---------------- Front / Back ----------------
-
+    // Front / Back
     T& front()
     {
         if (empty())
@@ -208,30 +169,13 @@ public:
         return m_tail->value;
     }
 
-    // ---------------- Iterators ----------------
+    // Iterators
+    Iterator begin() { return Iterator(m_head); }
+    Iterator end() { return Iterator(nullptr); }
+    Iterator begin() const { return Iterator(m_head); }
+    Iterator end() const { return Iterator(nullptr); }
 
-    Iterator begin()
-    {
-        return Iterator(m_head);
-    }
-
-    Iterator end()
-    {
-        return Iterator(nullptr);
-    }
-
-    Iterator begin() const
-    {
-        return Iterator(m_head);
-    }
-
-    Iterator end() const
-    {
-        return Iterator(nullptr);
-    }
-
-    // ---------------- Push Back ----------------
-
+    // Push Back
     void push_back(const T& value)
     {
         Node* node = new Node(value);
@@ -250,26 +194,7 @@ public:
         ++m_size;
     }
 
-    void push_back(T&& value)
-    {
-        Node* node = new Node(std::move(value));
-
-        if (empty())
-        {
-            m_head = m_tail = node;
-        }
-        else
-        {
-            m_tail->next = node;
-            node->prev = m_tail;
-            m_tail = node;
-        }
-
-        ++m_size;
-    }
-
-    // ---------------- Push Front ----------------
-
+    // Push Front
     void push_front(const T& value)
     {
         Node* node = new Node(value);
@@ -288,33 +213,13 @@ public:
         ++m_size;
     }
 
-    void push_front(T&& value)
-    {
-        Node* node = new Node(std::move(value));
-
-        if (empty())
-        {
-            m_head = m_tail = node;
-        }
-        else
-        {
-            node->next = m_head;
-            m_head->prev = node;
-            m_head = node;
-        }
-
-        ++m_size;
-    }
-
-    // ---------------- Pop ----------------
-
+    // Pop Front
     void pop_front()
     {
         if (empty())
             throw std::runtime_error("List is empty");
 
         Node* temp = m_head;
-
         m_head = m_head->next;
 
         if (m_head)
@@ -326,13 +231,60 @@ public:
         --m_size;
     }
 
+    void insert(size_t index, const T& value)
+    {
+        if (index > m_size)
+            throw std::out_of_range("Index out of range");
+
+        // Insert at front
+        if (index == 0)
+        {
+            push_front(value);
+            return;
+        }
+
+        // Insert at back (after last element)
+        if (index == m_size)
+        {
+            push_back(value);
+            return;
+        }
+
+        // Middle insertion
+        Node* node = new Node(value);
+        Node* curr;
+
+        if (index < m_size / 2)
+        {
+            curr = m_head;
+            for (size_t i = 0; i < index; ++i)
+                curr = curr->next;
+        }
+        else
+        {
+            curr = m_tail;
+            for (size_t i = m_size - 1; i >= index; --i)
+                curr = curr->prev;
+        }
+
+        Node* prevNode = curr->prev;
+
+        node->next = curr;
+        node->prev = prevNode;
+
+        prevNode->next = node;
+        curr->prev = node;
+
+        ++m_size;
+    }
+
+    // Pop Back
     void pop_back()
     {
         if (empty())
             throw std::runtime_error("List is empty");
 
         Node* temp = m_tail;
-
         m_tail = m_tail->prev;
 
         if (m_tail)
@@ -344,8 +296,66 @@ public:
         --m_size;
     }
 
-    // ---------------- Access ----------------
+    void erase(size_t index)
+    {
+        if (index >= m_size)
+            throw std::out_of_range("Index out of range");
 
+        // Case 1: first element
+        if (index == 0)
+        {
+            pop_front();
+            return;
+        }
+
+        // Case 2: last element
+        if (index == m_size - 1)
+        {
+            pop_back();
+            return;
+        }
+
+        // Case 3: middle element
+        Node* curr;
+
+        if (index < m_size / 2)
+        {
+            curr = m_head;
+            for (size_t i = 0; i < index; ++i)
+                curr = curr->next;
+        }
+        else
+        {
+            curr = m_tail;
+            for (size_t i = m_size - 1; i > index; --i)
+                curr = curr->prev;
+        }
+
+        curr->prev->next = curr->next;
+        curr->next->prev = curr->prev;
+
+        delete curr;
+        --m_size;
+    }
+
+    void erase(Iterator it)
+    {
+        if (it == end())
+            return;
+
+        Node* node = it.current;
+
+        if (node == m_head) { pop_front(); return; }
+        if (node == m_tail) { pop_back(); return; }
+
+        node->prev->next = node->next;
+        node->next->prev = node->prev;
+
+        delete node;
+        --m_size;
+    }
+
+    // Access
     T& getElement(size_t index)
     {
         if (index >= m_size)
@@ -356,14 +366,12 @@ public:
         if (index < m_size / 2)
         {
             curr = m_head;
-
             for (size_t i = 0; i < index; ++i)
                 curr = curr->next;
         }
         else
         {
             curr = m_tail;
-
             for (size_t i = m_size - 1; i > index; --i)
                 curr = curr->prev;
         }
@@ -381,14 +389,12 @@ public:
         if (index < m_size / 2)
         {
             curr = m_head;
-
             for (size_t i = 0; i < index; ++i)
                 curr = curr->next;
         }
         else
         {
             curr = m_tail;
-
             for (size_t i = m_size - 1; i > index; --i)
                 curr = curr->prev;
         }
@@ -396,8 +402,31 @@ public:
         return curr->value;
     }
 
-    // ---------------- Reverse ----------------
+    Iterator find(const T& value)
+    {
+        Node* curr = m_head;
+        while (curr)
+        {
+            if (curr->value == value)
+                return Iterator(curr);
+            curr = curr->next;
+        }
+        return end();
+    }
 
+    bool contains(const T& value) const
+    {
+        Node* curr = m_head;
+        while (curr)
+        {
+            if (curr->value == value)
+                return true;
+            curr = curr->next;
+        }
+        return false;
+    }
+
+    // Reverse
     void reverse()
     {
         Node* current = m_head;
@@ -408,7 +437,6 @@ public:
             temp = current->prev;
             current->prev = current->next;
             current->next = temp;
-
             current = current->prev;
         }
 

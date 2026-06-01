@@ -63,5 +63,8 @@
     <ClInclude Include="src\DS\Graph\AdjacencyMatrixGraph.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\DS\Graph\AdjacencyListGraph.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

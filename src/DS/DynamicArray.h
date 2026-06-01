@@ -23,26 +23,17 @@ private:
         m_capacity = newCapacity;
     }
 
-    void swap(T& a, T& b)
-    {
-        T temp = a;
-        a = b;
-        b = temp;
-    }
-
 public:
     // ---------------- Constructor ----------------
     DynamicArray()
         : m_data(nullptr), m_size(0), m_capacity(0)
-    {
-    }
+    {}
 
     explicit DynamicArray(size_t capacity)
         : m_data(nullptr), m_size(0), m_capacity(capacity)
     {
         if (m_capacity > 0)
             m_data = new T[m_capacity];
-        
     }
 
     // ---------------- Destructor ----------------
@@ -91,46 +82,9 @@ public:
         return *this;
     }
 
-    // ---------------- Move Constructor ----------------
-    DynamicArray(DynamicArray&& other) noexcept
-        : m_data(other.m_data),
-        m_size(other.m_size),
-        m_capacity(other.m_capacity)
-    {
-        other.m_data = nullptr;
-        other.m_size = 0;
-        other.m_capacity = 0;
-    }
-
-    // ---------------- Move Assignment ----------------
-    DynamicArray& operator=(DynamicArray&& other) noexcept
-    {
-        if (this == &other)
-            return *this;
-
-        delete[] m_data;
-
-        m_data = other.m_data;
-        m_size = other.m_size;
-        m_capacity = other.m_capacity;
-
-        other.m_data = nullptr;
-        other.m_size = 0;
-        other.m_capacity = 0;
-
-        return *this;
-    }
-
     // ---------------- Element Access ----------------
-    T& operator[](size_t index)
-    {
-        return at(index);
-    }
-
-    const T& operator[](size_t index) const
-    {
-        return at(index);
-    }
+    T& operator[](size_t index) { return at(index); }
+    const T& operator[](size_t index) const { return at(index); }
 
     T& at(size_t index)
     {
@@ -232,16 +186,16 @@ public:
     void clear()
     {
         m_size = 0;
-        m_capacity = 0;
-        delete[] m_data;
-        m_data = nullptr;
+        // NOTE: capacity is kept (important design fix)
     }
 
     void reverse()
     {
         for (size_t i = 0; i < m_size / 2; i++)
         {
-            swap(m_data[i], m_data[m_size - 1 - i]);
+            T temp = m_data[i];
+            m_data[i] = m_data[m_size - 1 - i];
+            m_data[m_size - 1 - i] = temp;
         }
     }
 };

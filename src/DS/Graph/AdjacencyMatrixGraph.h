@@ -30,7 +30,7 @@ public:
             m_Current = start;
         }
 
-        T operator*() const
+        const T& operator*() const
         {
             return m_Graph->m_Vertices[m_Current];
         }
@@ -77,25 +77,25 @@ public:
     };
 
 public:
-    AdjacencyMatrixGraph(Graph<T>::GraphDirectionType graphDirectionType)
-        : Graph<T>(graphDirectionType) {}
+    AdjacencyMatrixGraph(Graph<T>::GraphDirectionType type)
+        : Graph<T>(type) {}
 
     AdjacencyMatrixGraph(const DynamicArray<T>& vertices,
-        Graph<T>::GraphDirectionType graphDirectionType)
-        : Graph<T>(graphDirectionType), m_Vertices(vertices)
+        Graph<T>::GraphDirectionType type)
+        : Graph<T>(type), m_Vertices(vertices)
     {
         size_t n = m_Vertices.size();
 
         m_Graph = DynamicArray<DynamicArray<bool>>(n);
 
-        for (size_t row = 0; row < n; row++)
+        for (size_t i = 0; i < n; i++)
         {
-            DynamicArray<bool> newRow(n);
+            DynamicArray<bool> row(n);
 
-            for (size_t col = 0; col < n; col++)
-                newRow.push_back(false);
+            for (size_t j = 0; j < n; j++)
+                row.push_back(false);
 
-            m_Graph.push_back(newRow);
+            m_Graph.push_back(row);
         }
 
         this->m_VertexCount = n;
@@ -159,26 +159,20 @@ public:
 
         size_t idx = m_Vertices.find(value);
 
-        // 1. Remove all edges connected to this vertex
         for (size_t i = 0; i < m_Graph.size(); i++)
         {
             if (m_Graph[i][idx])
                 this->m_EdgeCount--;
 
-            m_Graph[i].erase(idx); // remove column
+            m_Graph[i].erase(idx);
         }
 
-        // 2. Remove the row
         m_Graph.erase(idx);
-
-        // 3. Remove vertex
         m_Vertices.erase(idx);
 
-        // 4. Update counters
         this->m_VertexCount--;
 
-        // (safety)
-        if (this->m_EdgeCount < 0)
+        if (this->m_EdgeCount > this->m_EdgeCount) // for safty
             this->m_EdgeCount = 0;
     }
 

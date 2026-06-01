@@ -3,7 +3,7 @@
 #include "DynamicArray.h"
 
 template<class T>
-class QueueArr : public IQueue
+class QueueArr : public IQueue<T>
 {
 protected:
     DynamicArray<T> m_DArray;

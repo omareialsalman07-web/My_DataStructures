@@ -157,6 +157,7 @@
     <ClInclude Include="src\DS\Array.h" />
     <ClInclude Include="src\DS\BinarySearchTree.h" />
     <ClInclude Include="src\DS\DynamicArray.h" />
+    <ClInclude Include="src\DS\Graph\AdjacencyListGraph.h" />
     <ClInclude Include="src\DS\Graph\AdjacencyMatrixGraph.h" />
     <ClInclude Include="src\DS\Graph\Graph.h" />
     <ClInclude Include="src\DS\IQueue.h" />
