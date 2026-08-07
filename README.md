@@ -48,6 +48,10 @@ My_DataStructures/
 All data structures are **header-only templates**, so you can simply
 `#include` them in your own code.
 
+Every ADT also comes with its own **iterator** (STL-style `begin()` / `end()`
+and `++` / `*` support), so you can loop over the structures naturally — just
+like you would with the STL.
+
 ## Requirements
 
 - Windows
@@ -96,6 +100,11 @@ This is a practice project for understanding how classic data structures are
 designed and implemented in C++. Each class is written to feel like the STL
 (iterators, `size()`, `empty()`, `clear()`, etc.), but the internals are
 hand-written so you can read and learn from them.
+
+> **Important note:** This project was made for **learning purposes only**.
+> It has **not been thoroughly tested**, so it may contain **logical bugs** and
+> some **performance issues**. Use it as a reference to study how data
+> structures work — not as a production-ready library.
 
 ## Roadmap (ideas)
 
